@@ -1,10 +1,15 @@
 package com.example.khaerulumam.khaerulumam_1202154148_studycase4;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -32,6 +37,10 @@ public class ListNamaMahasiswa extends AppCompatActivity {
     private ItemListView itemListView;
     private Button a;
 
+    ListNamaFragment fragment;
+
+    Activity activity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,23 +52,58 @@ public class ListNamaMahasiswa extends AppCompatActivity {
 
         mListView.setVisibility(View.GONE);
 
+        //mensetting toolbar yang akan muncul di atas dengan nama list mahasiswa
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.listnama);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("List Mahasiswa");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         mListView.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, new ArrayList<String>()));
 
 
         a.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                itemListView = new ItemListView();
+                itemListView = new ItemListView(activity);
                 itemListView.execute();
+
+//                fragment.beginTask();
             }
         });
+
+        if (savedInstanceState == null){
+            fragment = new ListNamaFragment();
+            getSupportFragmentManager().beginTransaction().add(fragment,"task").commit();
+        }else{ //activity created for subscquent time
+            fragment = (ListNamaFragment) getSupportFragmentManager().findFragmentByTag("task");
+        }
+
+        if (fragment != null){
+            if (fragment.itemListView != null && fragment.itemListView.getStatus() == AsyncTask.Status.RUNNING){
+               // progressBar.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
-    public class ItemListView  extends AsyncTask<Void, String, Void> {
+    class ItemListView  extends AsyncTask<Void, String, Void> {
+
+        private Activity activity;
+
+        public ItemListView(Activity activity){
+            this.activity = activity;
+        }
 
         private ArrayAdapter<String> mAdapter;
         private int counter=1;
         ProgressDialog mProgressDialog = new ProgressDialog(ListNamaMahasiswa.this);
+
+        public void onAttach(Activity activity){
+            this.activity = activity;
+        }
+
+        public void onDetach(){
+            activity = null;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -82,6 +126,13 @@ public class ListNamaMahasiswa extends AppCompatActivity {
                 }
             });
             mProgressDialog.show();
+
+//            if (ListNamaMahasiswa.this.getResources().getConfiguration().orientation== Configuration.ORIENTATION_PORTRAIT){
+//
+//                ListNamaMahasiswa.this.setRequestedOrientation(Configuration.ORIENTATION_PORTRAIT);
+//            } else {
+//                ListNamaMahasiswa.this.setRequestedOrientation(Configuration.ORIENTATION_LANDSCAPE);
+//            }
         }
 
         @Override
@@ -123,6 +174,8 @@ public class ListNamaMahasiswa extends AppCompatActivity {
             //remove progress dialog
             mProgressDialog.dismiss();
             mListView.setVisibility(View.VISIBLE);
+
+           // ListNamaMahasiswa.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
     }
 }

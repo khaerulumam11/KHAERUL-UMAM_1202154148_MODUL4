@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,6 +38,12 @@ public class PencariGambar extends AppCompatActivity {
                 new DownloadImage().execute(link);
             }
         });
+
+        //mensetting toolbar yang akan muncul di atas dengan nama Pencari Gambar
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.pencari);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Pencarian Gambar");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private class DownloadImage extends AsyncTask<String,Void,Bitmap> {@Override
